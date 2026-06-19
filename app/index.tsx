@@ -1,8 +1,16 @@
 import { AppButton } from "@/components/ui";
+import { useTodos } from "@/hooks";
 import { router } from "expo-router";
-import { View } from "react-native";
+import { Fragment, useEffect } from "react";
+import { Text, View } from "react-native";
 
 export default function Index() {
+  const { isLoading, getTodos, records } = useTodos();
+
+  useEffect(() => {
+    getTodos();
+  }, []);
+
   return (
     <View
       style={{
@@ -15,6 +23,13 @@ export default function Index() {
         title="Show My Todo List"
         onPress={() => router.push("/list")}
       />
+      {records.map((record) => {
+        return (
+          <Fragment key={record.id}>
+            <Text>{record.todo}</Text>
+          </Fragment>
+        );
+      })}
     </View>
   );
 }
