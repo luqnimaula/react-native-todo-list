@@ -1,7 +1,7 @@
 import { TodoListItem } from "@/components/todos";
 import { AppButton, StateMessage } from "@/components/ui";
 import { baseColor, neutralColor } from "@/constants/style";
-import { useTodos } from "@/hooks";
+import { useAuth, useTodos } from "@/hooks";
 import { TodoItem } from "@/types/todos";
 import { useCallback, useEffect } from "react";
 import {
@@ -37,6 +37,7 @@ const List: React.FC = () => {
     refresh,
     loadMore,
   } = useTodos();
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -73,6 +74,11 @@ const List: React.FC = () => {
 
   const renderHeader = () => (
     <View style={styles.header}>
+      {user ? (
+        <Text style={styles.greeting}>
+          Hi, {user.firstName} {user.lastName}
+        </Text>
+      ) : null}
       {/* A failed pull-to-refresh keeps the old list and shows a banner */}
       {error ? (
         <Text style={styles.errorBanner}>Refresh failed: {error.message}</Text>
@@ -164,6 +170,11 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
     gap: 8,
+  },
+  greeting: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: neutralColor.text,
   },
   counter: {
     fontSize: 13,

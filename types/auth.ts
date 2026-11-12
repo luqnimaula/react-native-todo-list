@@ -3,7 +3,12 @@ export type AuthLoginPayload = {
   password: string;
 };
 
-export type AuthLoginResponse = {
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type AuthUser = {
   id: number;
   username: string;
   email: string;
@@ -11,6 +16,8 @@ export type AuthLoginResponse = {
   lastName: string;
   gender: string;
   image: string;
-  accessToken: string;
-  refreshToken: string;
 };
+
+export type AuthLoginResponse = AuthUser & AuthTokens;
+
+export type AuthStatus = "loading" | "signedIn" | "signedOut";
