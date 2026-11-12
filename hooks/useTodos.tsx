@@ -1,4 +1,5 @@
 import { fetchTodos } from "@/services/todos";
+import { AppError } from "@/types/error";
 import { PaginationState } from "@/types/pagination";
 import { TodoItem } from "@/types/todos";
 import { getError } from "@/utils/error";
@@ -6,6 +7,7 @@ import { useCallback, useState } from "react";
 
 export const useTodos = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<AppError | null>(null);
   const [records, setRecords] = useState<TodoItem[]>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     limit: 0,
@@ -13,14 +15,15 @@ export const useTodos = () => {
     total: 0,
   });
 
-  const getTodos = useCallback(async () => {
+  const refetch = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setIsLoading(true);
       const { todos = [], limit = 0, skip = 0, total = 0 } = await fetchTodos();
       setRecords(todos);
       setPagination({ limit, skip, total });
     } catch (err) {
-      getError(err);
+      setError(getError(err));
     } finally {
       setIsLoading(false);
     }
@@ -28,8 +31,9 @@ export const useTodos = () => {
 
   return {
     isLoading,
+    error,
     records,
     pagination,
-    getTodos,
+    refetch,
   };
 };

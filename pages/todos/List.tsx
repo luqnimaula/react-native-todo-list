@@ -5,11 +5,12 @@ import { Fragment, useEffect } from "react";
 import { Text, View } from "react-native";
 
 const List: React.FC = () => {
-  const { isLoading, getTodos, records } = useTodos();
+  const { refetch, records } = useTodos();
 
+  // `refetch` is memoized with useCallback, so this runs once on mount
   useEffect(() => {
-    getTodos();
-  }, []);
+    refetch();
+  }, [refetch]);
 
   return (
     <View
