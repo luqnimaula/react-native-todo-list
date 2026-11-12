@@ -6,11 +6,11 @@ The focus is on production habits rather than features: typed API layers, normal
 
 ## Screenshots
 
-<!-- TODO: add screenshots -->
+Captured on an Android phone.
 
-| Login | Todo list | Error state |
-| --- | --- | --- |
-| _coming soon_ | _coming soon_ | _coming soon_ |
+| Login (with validation) | Todo list |
+| :---: | :---: |
+| <img src="docs/screenshots/login.jpg" alt="Login screen showing required-field errors and the DummyJSON demo account note" width="280"> | <img src="docs/screenshots/todo-list.jpg" alt="Todo list with a greeting, add form, done counter, and completed items struck through" width="280"> |
 
 ## Stack
 
