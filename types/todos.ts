@@ -10,3 +10,12 @@ export type TodoItem = {
 export type TodosResponse = PaginationState & {
   todos: TodoItem[];
 };
+
+export type CreateTodoPayload = Pick<TodoItem, "todo" | "completed" | "userId">;
+
+export type UpdateTodoPayload = Partial<Pick<TodoItem, "todo" | "completed">>;
+
+export type DeleteTodoResponse = TodoItem & {
+  isDeleted: boolean;
+  deletedOn: string;
+};

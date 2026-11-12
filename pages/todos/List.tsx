@@ -1,4 +1,4 @@
-import { TodoListItem } from "@/components/todos";
+import { AddTodoForm, TodoListItem } from "@/components/todos";
 import { AppButton, StateMessage } from "@/components/ui";
 import { baseColor, neutralColor } from "@/constants/style";
 import { useAuth, useTodos } from "@/hooks";
@@ -6,6 +6,7 @@ import { TodoItem } from "@/types/todos";
 import { useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   ListRenderItem,
   RefreshControl,
@@ -15,10 +16,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const renderItem: ListRenderItem<TodoItem> = ({ item }) => (
-  <TodoListItem item={item} />
-);
-
 const keyExtractor = (item: TodoItem) => String(item.id);
 
 const ItemSeparator = () => <View style={styles.separator} />;
@@ -26,8 +23,8 @@ const ItemSeparator = () => <View style={styles.separator} />;
 const List: React.FC = () => {
   const {
     records,
-    pagination,
     hasMore,
+    pendingIds,
     error,
     loadMoreError,
     isLoading,
@@ -36,6 +33,9 @@ const List: React.FC = () => {
     refetch,
     refresh,
     loadMore,
+    addTodo,
+    toggleTodo,
+    removeTodo,
   } = useTodos();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -49,7 +49,51 @@ const List: React.FC = () => {
     if (!loadMoreError) loadMore();
   }, [loadMoreError, loadMore]);
 
+  const handleAdd = useCallback(
+    async (text: string) => {
+      // DummyJSON requires a userId, which comes from the profile
+      if (!user) {
+        return { message: "Your profile is still loading. Try again." };
+      }
+      return addTodo(text, user.id);
+    },
+    [user, addTodo],
+  );
+
+  const handleToggle = useCallback(
+    async (item: TodoItem) => {
+      const toggleError = await toggleTodo(item);
+      if (toggleError) {
+        Alert.alert("Couldn't update todo", toggleError.message);
+      }
+    },
+    [toggleTodo],
+  );
+
+  const handleDelete = useCallback(
+    async (item: TodoItem) => {
+      const deleteError = await removeTodo(item);
+      if (deleteError) {
+        Alert.alert("Couldn't delete todo", deleteError.message);
+      }
+    },
+    [removeTodo],
+  );
+
+  const renderItem = useCallback<ListRenderItem<TodoItem>>(
+    ({ item }) => (
+      <TodoListItem
+        item={item}
+        isPending={pendingIds.has(item.id)}
+        onToggle={handleToggle}
+        onDelete={handleDelete}
+      />
+    ),
+    [pendingIds, handleToggle, handleDelete],
+  );
+
   const isEmpty = records.length === 0;
+  const doneCount = records.filter((record) => record.completed).length;
 
   if (isEmpty && isLoading) {
     return (
@@ -72,20 +116,23 @@ const List: React.FC = () => {
     );
   }
 
-  const renderHeader = () => (
+  // Passed to FlatList as elements, not inline components, so the add form
+  // keeps its text and keyboard focus when the list re-renders
+  const header = (
     <View style={styles.header}>
       {user ? (
         <Text style={styles.greeting}>
           Hi, {user.firstName} {user.lastName}
         </Text>
       ) : null}
+      <AddTodoForm onSubmit={handleAdd} />
       {/* A failed pull-to-refresh keeps the old list and shows a banner */}
       {error ? (
         <Text style={styles.errorBanner}>Refresh failed: {error.message}</Text>
       ) : null}
       {!isEmpty ? (
         <Text style={styles.counter}>
-          Showing {records.length} of {pagination.total}
+          {doneCount} of {records.length} done
         </Text>
       ) : null}
     </View>
@@ -111,7 +158,11 @@ const List: React.FC = () => {
       );
     }
     if (!isEmpty && !hasMore) {
-      return <Text style={[styles.footer, styles.counter]}>You&apos;re all caught up</Text>;
+      return (
+        <Text style={[styles.footer, styles.counter]}>
+          You&apos;re all caught up
+        </Text>
+      );
     }
     return null;
   };
@@ -127,14 +178,15 @@ const List: React.FC = () => {
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       ItemSeparatorComponent={ItemSeparator}
-      ListHeaderComponent={renderHeader}
-      ListFooterComponent={renderFooter}
+      ListHeaderComponent={header}
+      ListFooterComponent={renderFooter()}
       ListEmptyComponent={
         <StateMessage
           title="No todos yet"
-          message="Pull down to refresh."
+          message="Add one above, or pull down to refresh."
         />
       }
+      keyboardShouldPersistTaps="handled"
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}
       refreshControl={

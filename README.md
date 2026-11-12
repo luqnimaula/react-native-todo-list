@@ -2,6 +2,15 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## A note on DummyJSON writes
+
+The app uses [DummyJSON](https://dummyjson.com) as its API. DummyJSON **simulates** add, update and delete requests: it returns a realistic response but does not save anything. So:
+
+- Changes you make disappear when you pull to refresh or restart the app.
+- Every added todo comes back with the same id, and updating or deleting it returns 404. The app gives added todos a unique local id, and toggles or deletes them on the device only.
+
+Toggle, add and delete still update the UI immediately (optimistic updates) and roll back if the request fails.
+
 ## Get started
 
 1. Install dependencies
