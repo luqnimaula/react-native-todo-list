@@ -1,13 +1,5 @@
-import { Text, View } from "react-native";
+import List from "@/pages/todos/List";
 
-export default function List() {
-  return (
-    <View
-      style={{
-        width: "100%",
-      }}
-    >
-      <Text>[list goes here]</Text>
-    </View>
-  );
+export default function TodoListRoute() {
+  return <List />;
 }

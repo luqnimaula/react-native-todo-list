@@ -19,7 +19,7 @@ export default function RootLayout() {
           },
         }}
       >
-        <Stack.Screen name="index" options={{ title: "Todo List" }} />
+        <Stack.Screen name="list" options={{ title: "Todo List" }} />
       </Stack>
     </SafeAreaProvider>
   );

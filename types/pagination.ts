@@ -3,3 +3,5 @@ export type PaginationState = {
   skip: number;
   total: number;
 };
+
+export type PaginationParams = Pick<PaginationState, "limit" | "skip">;

@@ -1,5 +1,5 @@
-import List from "@/pages/todos/List";
+import { Redirect } from "expo-router";
 
 export default function Index() {
-  return <List />;
+  return <Redirect href="/list" />;
 }

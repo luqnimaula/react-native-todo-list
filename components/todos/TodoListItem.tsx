@@ -1,0 +1,50 @@
+import { baseColor, neutralColor } from "@/constants/style";
+import { TodoItem } from "@/types/todos";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { memo } from "react";
+import { StyleSheet, Text, View } from "react-native";
+
+type Props = {
+  item: TodoItem;
+};
+
+const TodoListItemComponent: React.FC<Props> = ({ item }) => {
+  return (
+    <View style={styles.container}>
+      <Ionicons
+        name={item.completed ? "checkmark-circle" : "ellipse-outline"}
+        size={22}
+        color={item.completed ? baseColor.success : baseColor.secondary}
+      />
+      <Text style={[styles.title, item.completed && styles.titleCompleted]}>
+        {item.todo}
+      </Text>
+    </View>
+  );
+};
+
+// Memoized so FlatList doesn't re-render every row when a new page is appended
+export const TodoListItem = memo(TodoListItemComponent);
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: neutralColor.surface,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: neutralColor.border,
+  },
+  title: {
+    flex: 1,
+    fontSize: 15,
+    color: neutralColor.text,
+  },
+  titleCompleted: {
+    color: neutralColor.textMuted,
+    textDecorationLine: "line-through",
+  },
+});
