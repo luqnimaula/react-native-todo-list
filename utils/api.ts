@@ -4,6 +4,9 @@ const api = create({
   baseURL: process.env.EXPO_PUBLIC_BASE_API,
   timeout: 10000,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {
